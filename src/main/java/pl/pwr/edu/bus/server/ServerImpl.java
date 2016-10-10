@@ -25,34 +25,11 @@ public class ServerImpl implements Server {
     public void run() throws IOException {
         System.out.println("Server started.. listening for connections");
         while (true) {
-            Socket client = listener.accept();
-            new Thread(() -> handleMessage(client)).start();
+            Socket socket = listener.accept();
+            new Thread(() -> new ClientHandler(socket)).start();
         }
     }
 
-    private void handleMessage(Socket socket) {
-        try {
-            BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter outputWriter = new PrintWriter(socket.getOutputStream(), true);
-            readLine(inputBuffer);
-        } catch (IOException e) {
-            System.err.println(e);
-            e.printStackTrace();
-        }
-    }
-
-    public String readLine(BufferedReader inputBuffer) {
-        String line = null;
-        try {
-            line = inputBuffer.readLine();
-        } catch (SocketException e) {
-            System.out.println("Log: Client disconnected, session ended");
-        } catch (IOException e) {
-            System.err.println(e);
-            e.printStackTrace();
-        }
-        return line;
-    }
 
     public static void main(String[] args) {
         final short PORT = 8080;
