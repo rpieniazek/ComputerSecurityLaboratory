@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/**
- * Created by rafal on 10.10.16.
- */
 public class Client {
 
     private Socket server;
@@ -21,7 +18,7 @@ public class Client {
         try {
             server = new Socket("127.0.0.1", 8080);
             inputBuffer = new BufferedReader(new InputStreamReader(server.getInputStream()));
-            outputWriter = new PrintWriter(server.getOutputStream());
+            outputWriter = new PrintWriter(server.getOutputStream(), true);
             sendTestMessage();
         } catch (IOException e) {
             System.err.println(e);
@@ -30,7 +27,7 @@ public class Client {
     }
 
     private void sendTestMessage() {
-        outputWriter.print("msg Hello world");
+        outputWriter.println("msg Hello world");
     }
 
     public static void main(String[] args) {

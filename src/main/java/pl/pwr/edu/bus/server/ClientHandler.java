@@ -12,7 +12,7 @@ import java.net.SocketException;
  */
 public class ClientHandler implements Runnable {
 
-    Socket socket;
+    private Socket socket;
     private PrintWriter outputWriter;
     private BufferedReader inputBuffer;
     private AuthenticationService authenticationService;
@@ -33,7 +33,7 @@ public class ClientHandler implements Runnable {
         try {
             inputBuffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             outputWriter = new PrintWriter(socket.getOutputStream(), true);
-            String readLine = readLine(inputBuffer);
+            String readLine = readLine();
             resolveMessage(readLine.toLowerCase());
         } catch (IOException e) {
             System.err.println(e);
@@ -44,9 +44,9 @@ public class ClientHandler implements Runnable {
     private void resolveMessage(String readedLine) {
         if (readedLine.startsWith("request")) {
             sendKeys();
-        }else if(readedLine.startsWith("encoding")){
+        } else if (readedLine.startsWith("encoding")) {
             setEncoding();
-        }else if(readedLine.startsWith("msg")){
+        } else if (readedLine.startsWith("msg")) {
             processMessage(readedLine);
         }
     }
@@ -63,12 +63,12 @@ public class ClientHandler implements Runnable {
         outputWriter.print(authenticationService.generateKeys());
     }
 
-    private String readLine(BufferedReader inputBuffer) {
+    private String readLine() {
         String line = null;
         try {
             line = inputBuffer.readLine();
         } catch (SocketException e) {
-            System.out.println("Log: Client disconnected, session ended");
+            System.out.println("Client disconnected, session ended");
         } catch (IOException e) {
             System.err.println(e);
             e.printStackTrace();
