@@ -1,33 +1,36 @@
 package pl.pwr.edu.bus.server;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Map;
 
-/**
- * Created by rafal on 10.10.16.
- */
+import static com.google.common.collect.ImmutableMap.of;
+
+
 public class ClientHandler implements Runnable, RequestProcessCommand {
 
     private Socket socket;
     private PrintWriter outputWriter;
     private BufferedReader inputBuffer;
-    private AuthenticationService authenticationService;
-    private RequestConverter requestConverter;
-
+    private ServerRequestConverter serverRequestConverter;
+    private BigInteger p;
+    private BigInteger g;
+    private BigInteger a;
+    private BigInteger b;
+    private BigInteger secret;
     public ClientHandler(Socket socket) {
         System.out.println("Client handler created ");
         this.socket = socket;
-        authenticationService = new AuthenticationService();
-        requestConverter = new RequestConverter(this);
+        serverRequestConverter = new ServerRequestConverter(this);
+        this.p = BigInteger.valueOf(23L);
+        this.g = BigInteger.valueOf(5L);
     }
 
     @Override
@@ -40,25 +43,48 @@ public class ClientHandler implements Runnable, RequestProcessCommand {
         try {
             inputBuffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             outputWriter = new PrintWriter(socket.getOutputStream(), true);
-            String requestLine = readLine();
-            requestConverter.resolveRequestsType(requestLine);
+            while (true) {
+                String requestLine = readLine();
+                System.out.println(String.format("Readed line: [%s]", requestLine));
+                serverRequestConverter.resolveRequestsType(requestLine);
+            }
         } catch (IOException e) {
             System.err.println(e);
             e.printStackTrace();
         }
     }
 
+    @Override
     public void processMessage(String readedLine) {
         System.out.println("server side:" + readedLine);
-        outputWriter.println("echo" + readedLine);
+    }
+
+    @Override
+    public void storeA(BigInteger a) {
+        this.a = a;
+        calculateSecret();
+    }
+
+    private void calculateSecret() {
+        secret = a.modPow(b,p);
+        System.out.println(String.format("Secret calculated for test Client by Server:[%d]", secret));
     }
 
     public void setEncoding() {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+
     public void sendKeys() {
-        outputWriter.println(authenticationService.generateKeys());
+        Gson gson = new Gson();
+        ImmutableMap<String, BigInteger> map = ImmutableMap.of("p", p, "g", g);
+        String request = gson.toJson(map);
+        outputWriter.println(request);
+        outputWriter.flush();
+        this.b = BigInteger.valueOf(15l);
+        BigInteger B = g.modPow(b,p);
+
+        outputWriter.println(gson.toJson(of("b", B)));
     }
 
     private String readLine() {
@@ -73,6 +99,4 @@ public class ClientHandler implements Runnable, RequestProcessCommand {
         }
         return line;
     }
-
-
 }

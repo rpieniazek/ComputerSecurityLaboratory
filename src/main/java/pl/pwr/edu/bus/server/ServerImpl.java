@@ -1,12 +1,8 @@
 package pl.pwr.edu.bus.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class ServerImpl implements Server {
 
@@ -30,7 +26,6 @@ public class ServerImpl implements Server {
             new Thread(new ClientHandler(socket)).start();
         }
     }
-
 
     public static void main(String[] args) {
         final short PORT = 8080;
