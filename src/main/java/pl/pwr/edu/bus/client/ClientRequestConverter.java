@@ -20,10 +20,7 @@ public class ClientRequestConverter {
 
     public void resolveKeys(String requestLine) {
         Map<String, String> requestAsMap = convertMessageFromJson(requestLine);
-        for (Entry<String, String> entry : requestAsMap.entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-            resolveSingleRequest(entry);
-        }
+        requestAsMap.entrySet().forEach(this::resolveSingleRequest);
     }
 
     public Map<String, String> convertMessageFromJson(String request) {

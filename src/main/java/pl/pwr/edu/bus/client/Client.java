@@ -1,6 +1,8 @@
 package pl.pwr.edu.bus.client;
 
 import com.google.gson.Gson;
+import pl.pwr.edu.bus.commons.MessageEncoder;
+import pl.pwr.edu.bus.commons.NoneEncoder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.Random;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -24,12 +27,13 @@ public class Client implements ClientRequestCommand {
     private BigInteger a;
     private BigInteger b;
     private BigInteger secret;
-
+    private MessageEncoder encoder;
 
     public Client() {
         clientRequestConverter = new ClientRequestConverter(this);
         gson = new Gson();
-            }
+        encoder = new NoneEncoder();
+    }
 
     @Override
     public void setP(BigInteger p) {
@@ -47,7 +51,10 @@ public class Client implements ClientRequestCommand {
 
     @Override
     public void processMessage(String message) {
-        System.out.println(message);//to do decode base 64
+        System.out.printf("raw message: %s\n", message);
+        String base64decoded = new String(Base64.getDecoder().decode(message));
+        String decodedMessage = encoder.decode(base64decoded, secret);
+        System.out.println(decodedMessage);
     }
 
     @Override
@@ -57,7 +64,7 @@ public class Client implements ClientRequestCommand {
     }
 
     private void calculateSecret() {
-        secret = b.modPow(a,p);
+        secret = b.modPow(a, p);
         System.out.println(String.format("Secret calculated for by Client:[%d]", secret));
     }
 
@@ -70,7 +77,7 @@ public class Client implements ClientRequestCommand {
 
             while (true) {
                 String readLine = readLine();
-                System.out.println(String.format("Read line %s",readLine));
+                System.out.println(String.format("Read line %s", readLine));
                 clientRequestConverter.resolveKeys(readLine);
             }
         } catch (IOException e) {
