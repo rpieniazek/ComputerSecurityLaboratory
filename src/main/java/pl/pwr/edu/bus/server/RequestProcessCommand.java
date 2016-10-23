@@ -9,7 +9,7 @@ public interface RequestProcessCommand {
 
     void sendKeys();
 
-    void setEncoding();
+    void setEncoding(String value);
 
     void processMessage(String line);
 

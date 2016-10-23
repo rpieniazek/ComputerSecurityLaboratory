@@ -37,8 +37,8 @@ public class ServerRequestConverter {
             command.sendKeys();
         }else if(key.startsWith("a")){
             command.storeA(new BigInteger(value));
-        }else if (key.startsWith("encoding")) {
-            command.setEncoding();
+        }else if (key.startsWith("encryption")) {
+            command.setEncoding(value);
         } else if (key.startsWith("msg")) {
             command.processMessage(value);
         }

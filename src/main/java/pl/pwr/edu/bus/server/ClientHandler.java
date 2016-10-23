@@ -2,6 +2,8 @@ package pl.pwr.edu.bus.server;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import pl.pwr.edu.bus.commons.MessageEncoder;
+import pl.pwr.edu.bus.commons.MessageEncoderFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Random;
 
 import static com.google.common.collect.ImmutableMap.of;
 
@@ -25,12 +28,14 @@ public class ClientHandler implements Runnable, RequestProcessCommand {
     private BigInteger a;
     private BigInteger b;
     private BigInteger secret;
+    private MessageEncoder messageEncoder;
+
     public ClientHandler(Socket socket) {
         System.out.println("Client handler created ");
         this.socket = socket;
         serverRequestConverter = new ServerRequestConverter(this);
-        this.p = BigInteger.valueOf(23L);
-        this.g = BigInteger.valueOf(5L);
+        this.p = BigInteger.probablePrime(10, new Random());
+        this.g = BigInteger.probablePrime(10, new Random());
     }
 
     @Override
@@ -70,8 +75,9 @@ public class ClientHandler implements Runnable, RequestProcessCommand {
         System.out.println(String.format("Secret calculated for test Client by Server:[%d]", secret));
     }
 
-    public void setEncoding() {
-        throw new UnsupportedOperationException("not yet implemented");
+    public void setEncoding(String value) {
+        MessageEncoderFactory encoderFactory = new MessageEncoderFactory();
+        messageEncoder = encoderFactory.create(value);
     }
 
 
@@ -81,7 +87,8 @@ public class ClientHandler implements Runnable, RequestProcessCommand {
         String request = gson.toJson(map);
         outputWriter.println(request);
         outputWriter.flush();
-        this.b = BigInteger.valueOf(15l);
+        Random random = new Random();
+        this.b = BigInteger.valueOf(random.nextLong());
         BigInteger B = g.modPow(b,p);
 
         outputWriter.println(gson.toJson(of("b", B)));

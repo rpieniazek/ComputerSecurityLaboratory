@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.util.Random;
 
 import static com.google.common.collect.ImmutableMap.of;
 
@@ -79,7 +80,8 @@ public class Client implements ClientRequestCommand {
     }
 
     private void calculateAndSendA() {
-        this.a = BigInteger.valueOf(6l);
+        Random random = new Random();
+        this.a = BigInteger.valueOf(random.nextLong());
         BigInteger A = g.modPow(a, p);
         outputWriter.println(gson.toJson(of("a", A)));
     }
