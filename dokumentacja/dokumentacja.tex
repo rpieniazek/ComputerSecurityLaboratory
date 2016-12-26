@@ -1,0 +1,43 @@
+
+\documentclass[12pt, a4paper, notitlepage]{report}
+\usepackage{polski, indentfirst, placeins}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+%\usepackage[a4paper]{geometry}
+\usepackage[pdftex]{graphicx}
+\usepackage{tabulary}
+\usepackage{rotating}
+\usepackage{listings}
+\usepackage[a4paper]{geometry}
+\usepackage[newcommands]{ragged2e}
+\usepackage[hidelinks, linktoc=all]{hyperref}
+\linespread{1.3}
+\renewcommand{\thesection}{\arabic{section}}%usunięcie zbędnego zera z numeracji sekcji
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\renewcommand{\labelitemii}{$ \circ$}
+\renewcommand{\labelitemiii}{$ \cdot$}
+
+\title{Bezpieczeństwo Systemów\\ i\\ Usług Informatycznych\\  Bezpieczny komunikator }
+\author{Rafał Pieniążek}
+\date{prowadzący : mgr inż.Przemysław Świercz }
+
+\begin{document}
+	\maketitle
+	\newpage
+	\section{Cel i zakres projektu}
+		Celem projektu było zaimplementowanie bezpiecznego komunikatora. Do wymiany kluczy szyfrujących wykorzystano algorytm Diffiego-Hellmana. Aplikacja pozwala na ustalenie wspólnego klucza szyfrującego poprzez wymianę kilku informacji niezbędnych do obliczenia bezpiecznego wyniku. Aplikacja umożliwia ponadto zaszyfrowanie i odszyfrowanie wiadomości poprzez szyfr Cezara i Xorowanie wiadomości kluczem. Algorytm szyfrowania Cezara został przetestowany jednostkowo dzięki bibliotece JUnit.
+	\section{Sposób wykonania projektu}
+		Projekt został wykonany w języku Java, przy pomocy biblioteki umożliwiającej nawiązywanie połączenia poprzez Sockety webowe. Aplikacja wspiera uzgodniony podczas zajęć format wymiany informacji typu JSON. Kolejne typy wiadomości są rozpoznawane i przetwarzane przy wsparciu biblioteki Gson.
+		\subsection{Generowanie kluczy}
+			Dwie długie liczby pierwsze zostają wygenerowane losowo dzięki wsparciu wbudowanej biblioteki Javy - BigInteger. Znajdująca się tam metoda possiblePrime() spełnia wymagania tego projektu. Dla każdego nowego klienta generowane są nowe liczy p i g, co pociąga za sobą różne liczy A i B, oraz secret. 
+		\subsection{Kodowanie wiadomości}
+			Zaimplementowano dwa rodzaje szyfrowania - szyfr Cezara z przesunięciem secret modulo 26, oraz xorowanie kolejnych bitów wiadomości z bitami secretu.
+		\subsection{Architektura projektu}
+			Podczas rozowoju projektu dbano o czystość kodu, oraz starano się wykorzystać w jak najlepszym stopniu wzorce projektowe. Zarówno w implementacji serwera, jak i Klienta znaleźć można wzorzec Polecenie.Pozwolił on odseparować pewien model wynikający z założeń projektu, od logiki operującej na niej. Dodatkowo wykorzystano wzorzec Fabryki do tworzenia modułu szyfrującego wiadomości.
+	
+	\section{Wnioski}
+		Wykonanie projektu umożliwiło stworzenie dobrej i bezpiecznej architektury aplikacji typu klient - serwer. Dodatkowo samodzielne zaimplementowanie algorytmu pozwoliło lepsze zrozumienie zależności występujących pomiędzy kolejnymi krokami algorytmu.
+\end{document}
+
